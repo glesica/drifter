@@ -2,20 +2,28 @@ package drifter
 
 import "math/rand"
 
+var nextID int = 0
+
 type Trace struct {
-	ID                    int
-	X                     float64
-	Y                     float64
-	VX                    float64
-	VY                    float64
-	AX                    float64
-	AY                    float64
-	PathX                 []float64
-	PathY                 []float64
-	PathVX                []float64
-	PathVY                []float64
-	minCaptureDelta       float64
-	deltaSinceLastCapture float64
+	ID     int
+	Active bool
+	X      float64
+	Y      float64
+	VX     float64
+	VY     float64
+	AX     float64
+	AY     float64
+}
+
+func NewTrace(x, y float64) *Trace {
+	// Note that this isn't thread-safe because we don't lock nextID!
+	nextID++
+	return &Trace{
+		ID:     nextID - 1,
+		Active: true,
+		X:      x,
+		Y:      y,
+	}
 }
 
 func (t *Trace) Advance(ax, ay, delta float64) {
@@ -33,17 +41,6 @@ func (t *Trace) Advance(ax, ay, delta float64) {
 
 	t.AX = ax
 	t.AY = ay
-}
-
-func (t *Trace) Capture(delta float64) {
-	t.deltaSinceLastCapture += delta
-	if t.deltaSinceLastCapture >= t.minCaptureDelta {
-		t.deltaSinceLastCapture = 0.0
-		t.PathX = append(t.PathX, t.X)
-		t.PathY = append(t.PathY, t.Y)
-		t.PathVX = append(t.PathVX, t.VX)
-		t.PathVY = append(t.PathVY, t.VY)
-	}
 }
 
 func (t *Trace) Damp(amount float64, delta float64) {

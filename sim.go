@@ -1,31 +1,55 @@
 package drifter
 
 type Sim struct {
-	field  *Field
-	traces []*Trace
+	timestamp float64
+	field     Field
+	traces    []*Trace
+	logger    *Logger
 }
 
-func NewSim(field *Field) *Sim {
+func NewSim(field Field) *Sim {
 	return &Sim{
-		field: field,
+		field:  field,
+		logger: NewLogger(),
 	}
 }
 
 func (s *Sim) AddTrace(t *Trace) {
 	s.traces = append(s.traces, t)
+	s.logger.Add(t.ID, s.timestamp, t.X, t.Y, t.VX, t.VY)
 }
 
 func (s *Sim) Advance(delta float64) {
-	for _, trace := range s.traces {
-		damping := s.field.Damping(trace.X, trace.Y)
-		trace.Damp(damping, delta)
+	s.timestamp += delta
 
-		ax, ay := s.field.Acceleration(trace.X, trace.Y)
-		trace.Advance(ax, ay, delta)
+	for _, t := range s.traces {
+		if !s.field.Valid(t.X, t.Y) {
+			t.Active = false
+		}
 
-		x, y := s.field.Wrap(trace.X, trace.Y)
-		trace.MoveTo(x, y)
+		if !t.Active {
+			continue
+		}
 
-		trace.Capture(delta)
+		damping := s.field.Damping(t.X, t.Y)
+		t.Damp(damping, delta)
+
+		ax, ay := s.field.Acceleration(t.X, t.Y)
+		t.Advance(ax, ay, delta)
+
+		x, y := s.field.Wrap(t.X, t.Y)
+		t.MoveTo(x, y)
+
+		s.logger.Add(t.ID, s.timestamp, t.X, t.Y, t.VX, t.VY)
 	}
+}
+
+func (s *Sim) AdvanceTo(delta, ts float64) {
+	for s.timestamp < ts {
+		s.Advance(delta)
+	}
+}
+
+func (s *Sim) History() *History {
+	return s.logger.History()
 }
