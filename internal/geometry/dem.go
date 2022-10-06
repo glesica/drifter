@@ -65,6 +65,8 @@ func (d *DEM) AtInter(x, y float64) float64 {
 // AccelAt returns the estimated acceleration at the given point
 // within the region covered by the DEM, where x ranges within
 // [0.0, d.width] and y ranges within [0.0, d.height].
+// Note that acceleration due to gravity is implicitly assigned
+// a value of 1.0.
 func (d *DEM) AccelAt(x, y float64) (float64, float64) {
 	centerX, centerY := d.discretize(x, y)
 

@@ -30,3 +30,19 @@ func LineDrawer(canvas Canvas) Drawer {
 		canvas.Stroke()
 	}
 }
+
+func PointDrawer(canvas Canvas, radius float64) Drawer {
+	return func(iter *history.Iterator) {
+		canvas.SetColor(color.Black)
+
+		for {
+			ok, snapshot := iter.Next()
+			if !ok {
+				break
+			}
+
+			canvas.DrawPoint(snapshot.X(), snapshot.Y(), radius)
+			canvas.Fill()
+		}
+	}
+}
