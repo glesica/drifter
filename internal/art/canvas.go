@@ -1,4 +1,4 @@
-package drifter
+package art
 
 import (
 	"image/color"

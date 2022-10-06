@@ -1,4 +1,4 @@
-package drifter
+package terrain
 
 import "math"
 
