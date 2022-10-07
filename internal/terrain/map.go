@@ -20,6 +20,9 @@ type Map interface {
 	//
 	// If this function is called with an invalid point its return value
 	// is invalid and undefined, implementations may choose to panic.
+	//
+	// For example, if damping is 0.1, then acceleration will be reduced
+	// by 0.1 or 10%.
 	Damping(x, y float64) float64
 
 	// Valid indicates whether the given point is a valid point on the field.

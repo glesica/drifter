@@ -2,9 +2,7 @@ package geometry
 
 import "math"
 
-func MakeBowl(w, h int, depth float64) *DEM {
-	radius := math.Sqrt(0.25*float64(w*w) + 0.25*float64(h*h))
-
+func MakeBowl(w, h int) *DEM {
 	midX := w / 2
 	midY := h / 2
 
@@ -17,7 +15,7 @@ func MakeBowl(w, h int, depth float64) *DEM {
 
 			dist := math.Sqrt(dx*dx + dy*dy)
 
-			dem.Set(x, y, dist/radius*depth)
+			dem.Set(x, y, math.Pow(dist, 1.25))
 		}
 	}
 

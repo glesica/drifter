@@ -26,7 +26,21 @@ func (d *Driver) Render(drawer art.Drawer) {
 
 func (d *Driver) Update(dt float64) {
 	for _, trace := range d.traces {
-		ax, ay := d.field.Acceleration(trace.X(), trace.Y())
+		x := trace.X()
+		y := trace.Y()
+
+		if !d.field.Valid(x, y) {
+			x, y = d.field.Wrap(x, y)
+			if !d.field.Valid(x, y) {
+				continue
+			}
+		}
+
+		ax, ay := d.field.Acceleration(x, y)
+
+		damp := d.field.Damping(x, y)
+		ax, ay = ax-ax*damp, ay-ay*damp
+
 		trace.Update(ax, ay, dt)
 	}
 }
